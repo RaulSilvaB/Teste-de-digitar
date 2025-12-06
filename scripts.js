@@ -8,22 +8,31 @@ const textos = [
 
 ];
 
+
 let contadorCerto = 0;
 let contadorErrado = 0;
 let intervaloTempo;
 let tempoRestante = 60;
 let textAtual = ''
 
+const elementoEntrada = document.getElementById('entrada');
+const elementoTexto = document.getElementById('texto');
+const spanCerto = document.getElementById('contador-certo');
+const spanErrado = document.getElementById('contador-errado');
+const spanTempo = document.getElementById('contador-tempo');
+
+
+
 function iniciarContadorTempo() {
 
     if(intervaloTempo) clearInterval(intervaloTempo)
     
     tempoRestante = 60
-    document.getElementById('contador-tempo').textContent = tempoRestante
+    spanTempo.textContent = tempoRestante
 
     intervaloTempo = setInterval(() => {
         tempoRestante--
-        document.getElementById('contador-tempo').textContent = tempoRestante
+        spanTempo.textContent = tempoRestante
 
         if(tempoRestante <= 0){
             clearInterval(intervaloTempo)
@@ -49,26 +58,85 @@ function verificarResultado() {
 
 function resetar(){
 
-    const elementoEntrada = document.getElementById('entrada')
+    
     elementoEntrada.value = ''
-    elementoEntrada.disable = true
+    elementoEntrada.disabled = true
 
     clearInterval(intervaloTempo)
 
-    document.getElementById('contador-certo').textContent = '0'
-    document.getElementById('contador-errado').textContent = '0'
-    document.getElementById('contador-tempo').textContent = '60'
+    spanCerto.textContent = '0'
+    spanErrado.textContent = '0'
+    spanTempo.textContent = '60'
     
     tempoRestante = 60
     contadorCerto = 0
     contadorErrado = 0
-
-    document.getElementById('texto').children.forEach(element => {
-        span.classList.remove('certo','errado')
-    });
-}
-
-function mudarnivel(nivel){
-
     
+
+    Array.from(elementoTexto.children).forEach(span => {
+        span.classList.remove('certo', 'errado');
+    });
+    
+    elementoTexto.innerHTML = 'Escolha um nível para começar.';
 }
+
+function mudarNivel(nivel){
+
+    resetar()
+
+    textAtual = textos[nivel - 1]
+    elementoTexto.innerHTML = textAtual.split('').map(char => `<span>${char}</span>`).join('')
+
+    document.getElementById('entrada').disabled = false  
+   
+
+}
+
+elementoEntrada.addEventListener('input', function(){
+
+    if(tempoRestante === 60) iniciarContadorTempo()
+
+    const entradaTexto = this.value
+
+    if(entradaTexto.length > textAtual.length ){
+
+        this.value = entradaTexto.substring(0,textAtual.length)
+        return
+    }
+
+    contadorCerto = 0
+    contadorErrado = 0
+
+    Array.from(elementoTexto.children).forEach((span,index) => {
+
+        if (index < entradaTexto.length) {
+            
+        if (entradaTexto[index] == span.textContent) {
+            span.classList.add('certo')
+            span.classList.remove('errado')
+
+            contadorCerto++
+            
+        } else {
+            span.classList.add('errado')
+            span.classList.remove('certo')
+
+            contadorErrado++
+            
+        }
+        } else {
+            span.classList.remove('certo','errado')
+        }
+
+      
+
+    })
+
+    spanCerto.textContent = contadorCerto
+    spanErrado.textContent = contadorErrado
+
+    if(entradaTexto.length == textAtual.length){
+        verificarResultado()
+    }
+
+})

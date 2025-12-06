@@ -70,6 +70,15 @@ body,html{
     color: red;
 }
 
+#contador-certo{
+    font-size: 21px;
+    color: green;
+}
+
+#contador-errado{
+    font-size: 21px;
+    color: red;
+}
 
 
 
